@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>TestSecondsCounter.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">ShuffleGameTesting (Sep 17, 2025 5:27:53 PM)</a> &gt; <a href="../../index.html" class="el_group">ShuffleGameTesting</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">testing</a> &gt; <span class="el_source">TestSecondsCounter.java</span></div><h1>TestSecondsCounter.java</h1><pre class="source lang-java linenums">package testing;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;  
+import javax.swing.*;     
+import java.awt.event.ActionEvent;
+
+import shuff.SecondsCounter;
+import shuff.ShuffleGame;
+
+<span class="fc" id="L11">public class TestSecondsCounter {</span>
+
+    @Test
+    void testInitCounter() {
+<span class="fc" id="L15">        SecondsCounter counter = new SecondsCounter();</span>
+<span class="fc" id="L16">        counter.initCounter();</span>
+<span class="fc" id="L17">        assertEquals(0, counter.getTimeElapsedInSeconds(), &quot;Counter should start at 0&quot;);</span>
+<span class="fc" id="L18">    }</span>
+
+    @Test
+    void testGetMinitueString() {
+<span class="fc" id="L22">        SecondsCounter counter = new SecondsCounter();</span>
+<span class="fc" id="L23">        assertEquals(&quot;00 : 00&quot;, counter.getMinitueString(0));</span>
+<span class="fc" id="L24">        assertEquals(&quot;00 : 09&quot;, counter.getMinitueString(9));</span>
+<span class="nc" id="L25">        assertEquals(&quot;01 : 00&quot;, counter.getMinitueString(60));</span>
+<span class="nc" id="L26">        assertEquals(&quot;01 : 05&quot;, counter.getMinitueString(65));</span>
+<span class="nc" id="L27">        assertEquals(&quot;10 : 10&quot;, counter.getMinitueString(610));</span>
+<span class="nc" id="L28">    }</span>
+
+    @Test
+    void testGetTimeElapsed() {
+<span class="fc" id="L32">        SecondsCounter counter = new SecondsCounter();</span>
+<span class="fc" id="L33">        counter.counter = 125; // 2 minutes 5 seconds</span>
+<span class="nc" id="L34">        assertEquals(&quot;02 Minutes &amp; 05 Seconds &quot;, counter.getTimeElapsed());</span>
+<span class="nc" id="L35">    }</span>
+
+    @Test
+    void testActionPerformedIncrementsCounter() {
+<span class="fc" id="L39">        SecondsCounter counter = new SecondsCounter();</span>
+<span class="fc" id="L40">        JLabel label = new JLabel();</span>
+<span class="fc" id="L41">        counter.setLabel(label);</span>
+<span class="fc" id="L42">        counter.counter = 0;</span>
+<span class="fc" id="L43">        counter.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));</span>
+<span class="fc" id="L44">        assertEquals(1, counter.getTimeElapsedInSeconds());</span>
+<span class="fc" id="L45">        assertEquals(&quot;00 : 01&quot;, label.getText());</span>
+<span class="fc" id="L46">    }</span>
+
+    @Test
+    void testStartSetsLabelAndStartsTimer() {
+<span class="fc" id="L50">        SecondsCounter counter = new SecondsCounter();</span>
+<span class="fc" id="L51">        JLabel label = new JLabel();</span>
+<span class="fc" id="L52">        counter.setLabel(label);</span>
+<span class="fc" id="L53">        counter.start();</span>
+<span class="fc" id="L54">        assertEquals(ShuffleGame.INIT_TIME, label.getText(), &quot;Label should be initialized with INIT_TIME&quot;);</span>
+<span class="fc" id="L55">        assertTrue(counter.timer_.isRunning(), &quot;Timer should be running after start()&quot;);</span>
+<span class="fc" id="L56">    }</span>
+
+    @Test
+    void testPauseStopsTimer() {
+<span class="fc" id="L60">        SecondsCounter counter = new SecondsCounter();</span>
+<span class="fc" id="L61">        JLabel label = new JLabel();</span>
+<span class="fc" id="L62">        counter.setLabel(label);</span>
+<span class="fc" id="L63">        counter.start();</span>
+<span class="fc" id="L64">        counter.pause();</span>
+<span class="fc" id="L65">        assertFalse(counter.timer_.isRunning(), &quot;Timer should be stopped after pause()&quot;);</span>
+<span class="fc" id="L66">    }</span>
+
+    @Test
+    void testStopResetsCounterAndStopsTimer() {
+<span class="fc" id="L70">        SecondsCounter counter = new SecondsCounter();</span>
+<span class="fc" id="L71">        JLabel label = new JLabel();</span>
+<span class="fc" id="L72">        counter.setLabel(label);</span>
+<span class="fc" id="L73">        counter.start();</span>
+<span class="fc" id="L74">        counter.counter = 10;</span>
+<span class="fc" id="L75">        counter.stop();</span>
+<span class="fc" id="L76">        assertEquals(0, counter.counter, &quot;Counter should be reset to 0 after stop()&quot;);</span>
+<span class="fc" id="L77">        assertFalse(counter.timer_.isRunning(), &quot;Timer should be stopped after stop()&quot;);</span>
+<span class="fc" id="L78">    }</span>
+
+    @Test
+    void testReStartResetsAndStartsTimer() {
+<span class="fc" id="L82">        SecondsCounter counter = new SecondsCounter();</span>
+<span class="fc" id="L83">        JLabel label = new JLabel();</span>
+<span class="fc" id="L84">        counter.setLabel(label);</span>
+<span class="fc" id="L85">        counter.counter = 50;</span>
+<span class="fc" id="L86">        counter.reStart();</span>
+<span class="fc" id="L87">        assertEquals(0, counter.counter, &quot;Counter should be reset to 0 after reStart()&quot;);</span>
+<span class="fc" id="L88">        assertTrue(counter.timer_.isRunning(), &quot;Timer should be running after reStart()&quot;);</span>
+<span class="fc" id="L89">        assertEquals(ShuffleGame.INIT_TIME, label.getText(), &quot;Label should be reset after reStart()&quot;);</span>
+<span class="fc" id="L90">    }</span>
+
+    @Test
+    void testEnableStartsTimer() {
+<span class="fc" id="L94">        SecondsCounter counter = new SecondsCounter();</span>
+<span class="fc" id="L95">        counter.timer_.stop();</span>
+<span class="fc" id="L96">        counter.enable();</span>
+<span class="fc" id="L97">        assertTrue(counter.timer_.isRunning(), &quot;Timer should be running after enable()&quot;);</span>
+<span class="fc" id="L98">    }</span>
+
+    @Test
+    void testFinalizeSetsTimerNull() {
+<span class="fc" id="L102">        SecondsCounter counter = new SecondsCounter();</span>
+<span class="fc" id="L103">        counter.finalize();</span>
+<span class="fc" id="L104">        assertNull(counter.timer_, &quot;Timer should be null after finalize()&quot;);</span>
+<span class="fc" id="L105">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span>ShuffleGameTesting (Sep 17, 2025 5:27:53 PM)</div></body></html>

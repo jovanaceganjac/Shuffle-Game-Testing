@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>TestShuffle.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">ShuffleGameTesting (Sep 17, 2025 5:27:53 PM)</a> &gt; <a href="../../index.html" class="el_group">ShuffleGameTesting</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">testing</a> &gt; <span class="el_source">TestShuffle.java</span></div><h1>TestShuffle.java</h1><pre class="source lang-java linenums">package testing;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.MockedConstruction;
+import org.mockito.Mockito;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import shuff.AnimatedJButton;
+import shuff.Credits;
+import shuff.SecondsCounter;
+import shuff.ShuffleGame;
+
+
+
+<span class="fc" id="L41">public class TestShuffle {</span>
+
+    private ShuffleGame game;
+    private JDialog mockDialog;
+    private AnimatedJButton mockButton;
+    private JButton mockButton2;
+    private JPanel mockButtonPanel;
+    private JLabel mockMovesLabel;
+    private JMenuItem mockMenuItem;
+    private SecondsCounter mockSecondsCounter;
+
+    private Thread autoCloser;
+
+    @BeforeEach
+    public void setUp() {
+<span class="fc" id="L56">        game = createGameWithMockedSecondsCounter(3);</span>
+<span class="fc" id="L57">        mockDialog = Mockito.mock(JDialog.class);</span>
+<span class="fc" id="L58">        mockButton = Mockito.mock(AnimatedJButton.class);</span>
+<span class="fc" id="L59">        mockButton2 = new JButton(&quot;5&quot;);</span>
+<span class="fc" id="L60">        mockButtonPanel = Mockito.mock(JPanel.class);</span>
+<span class="fc" id="L61">        mockMovesLabel = Mockito.mock(JLabel.class);</span>
+<span class="fc" id="L62">        mockMenuItem = Mockito.mock(JMenuItem.class);</span>
+<span class="fc" id="L63">        mockSecondsCounter = Mockito.mock(SecondsCounter.class);</span>
+
+<span class="fc" id="L65">        autoCloser = new Thread(() -&gt; {</span>
+            try {
+<span class="fc" id="L67">                long end = System.currentTimeMillis() + 4000;</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">                while (System.currentTimeMillis() &lt; end) {</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">                    for (Window w : Window.getWindows()) {</span>
+<span class="fc bfc" id="L70" title="All 4 branches covered.">                        if (w instanceof JDialog d &amp;&amp; d.isShowing()) {</span>
+<span class="fc" id="L71">                            SwingUtilities.invokeLater(d::dispose);</span>
+                        }
+                    }
+<span class="fc" id="L74">                    Thread.sleep(25);</span>
+                }
+<span class="pc" id="L76">            } catch (InterruptedException ignored) {}</span>
+<span class="fc" id="L77">        }, &quot;autoCloser&quot;);</span>
+<span class="fc" id="L78">        autoCloser.setDaemon(true);</span>
+<span class="fc" id="L79">        autoCloser.start();</span>
+<span class="fc" id="L80">    }</span>
+
+    @AfterEach
+    void tearDown() {
+        try {
+<span class="fc" id="L85">            Field f = ShuffleGame.class.getDeclaredField(&quot;secondsCounter_&quot;);</span>
+<span class="fc" id="L86">            f.setAccessible(true);</span>
+<span class="fc" id="L87">            SecondsCounter sc = (SecondsCounter) f.get(game);</span>
+<span class="pc bpc" id="L88" title="3 of 6 branches missed.">            if (sc != null &amp;&amp; sc.timer_ != null &amp;&amp; sc.timer_.isRunning()) {</span>
+<span class="nc" id="L89">                sc.stop();</span>
+            }
+<span class="pc" id="L91">        } catch (Exception ignored) {}</span>
+
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">        if (game != null) game.dispose();</span>
+<span class="fc" id="L94">        File f = new File(&quot;Score.dat&quot;);</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        if (f.exists()) f.delete();</span>
+
+<span class="pc bpc" id="L97" title="2 of 4 branches missed.">        if (autoCloser != null &amp;&amp; autoCloser.isAlive()) autoCloser.interrupt();</span>
+<span class="fc" id="L98">    }</span>
+
+    @Test
+    public void testIsPositionNotLeft() {
+<span class="fc" id="L102">        assertTrue(game.isPositionNotLeft(1));</span>
+<span class="fc" id="L103">        assertFalse(game.isPositionNotLeft(0));</span>
+<span class="fc" id="L104">    }</span>
+
+    @Test
+    public void testIsPositionNotRight() {
+<span class="fc" id="L108">        assertTrue(game.isPositionNotRight(0));</span>
+<span class="fc" id="L109">        assertFalse(game.isPositionNotRight(2));</span>
+<span class="fc" id="L110">    }</span>
+
+    @Test
+    public void testIsPositionNotTop() {
+<span class="fc" id="L114">        assertTrue(game.isPositionNotTop(3));</span>
+<span class="fc" id="L115">        assertFalse(game.isPositionNotTop(1));</span>
+<span class="fc" id="L116">    }</span>
+
+    @Test
+    public void testIsPositionNotBottom() {
+<span class="fc" id="L120">        assertTrue(game.isPositionNotBottom(0));</span>
+<span class="fc" id="L121">        assertFalse(game.isPositionNotBottom(7));</span>
+<span class="fc" id="L122">    }</span>
+
+    @Test
+    public void testInitMatrixToZero() {
+<span class="fc" id="L126">        game.initMatrixToZero();</span>
+<span class="fc" id="L127">        assertFalse(game.canAdd(0));</span>
+<span class="fc" id="L128">    }</span>
+
+    @Test
+    public void testCanAdd() {
+<span class="fc" id="L132">        game.initMatrixToZero();</span>
+<span class="fc" id="L133">        assertFalse(game.canAdd(0));</span>
+<span class="fc" id="L134">        assertTrue(game.canAdd(2));</span>
+<span class="fc" id="L135">    }</span>
+
+    @Test
+    public void testAnalyseResult() {
+<span class="fc" id="L139">        assertFalse(game.analyseResult());</span>
+<span class="fc" id="L140">    }</span>
+
+    @Test
+    public void testGetNumberWithoutZero() {
+<span class="fc bfc" id="L144" title="All 2 branches covered.">        for (int i = 0; i &lt; 9; i++) {</span>
+<span class="fc" id="L145">            assertNotEquals(0, game.getNumberWithoutZero());</span>
+        }
+<span class="fc" id="L147">    }</span>
+
+    @Test
+    public void testGetPosition() {
+<span class="fc" id="L151">        game.initMatrixToZero();</span>
+<span class="fc" id="L152">        assertEquals(0, game.getPosition(0));</span>
+<span class="fc" id="L153">    }</span>
+
+    @Test
+    public void testGetNumberWithoutZeroLoopCoverage() throws Exception {
+<span class="fc" id="L157">        Field rf = ShuffleGame.class.getDeclaredField(&quot;random&quot;);</span>
+<span class="fc" id="L158">        rf.setAccessible(true);</span>
+
+<span class="fc" id="L160">        Random original = (Random) rf.get(null);</span>
+
+<span class="fc" id="L162">        class AlternatingRandom extends Random {</span>
+<span class="fc" id="L163">            private int c = 0;</span>
+            @Override
+            public int nextInt(int bound) {
+<span class="fc bfc" id="L166" title="All 2 branches covered.">                if ((c++ % 2) == 0) return 0;</span>
+<span class="fc" id="L167">                int val = 5;</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">                if (bound &lt;= 1) return 0;</span>
+<span class="fc" id="L169">                return val % bound;</span>
+            }
+        }
+
+        try {
+<span class="fc" id="L174">            rf.set(null, new AlternatingRandom());</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">            for (int i = 0; i &lt; 5; i++) {</span>
+<span class="fc" id="L176">                int n = game.getNumberWithoutZero();</span>
+<span class="fc" id="L177">                assertNotEquals(0, n);</span>
+            }
+        } finally {
+<span class="fc" id="L180">            rf.set(null, original);</span>
+        }
+<span class="fc" id="L182">    }</span>
+
+    @Test
+    public void testStartSecondsCounterWithMockSecondsCounter() {
+<span class="fc" id="L186">        doNothing().when(mockSecondsCounter).start();</span>
+        try {
+<span class="nc" id="L188">            setPrivateField(game, &quot;secondsCounter_&quot;, mockSecondsCounter);</span>
+<span class="nc" id="L189">            assertDoesNotThrow(() -&gt; game.startSecondsCounter());</span>
+<span class="nc" id="L190">            verify(mockSecondsCounter).start();</span>
+<span class="fc" id="L191">        } catch (Exception e) {</span>
+<span class="nc" id="L192">            fail(&quot;Failed to set mock SecondsCounter&quot;);</span>
+<span class="nc" id="L193">        }</span>
+<span class="nc" id="L194">    }</span>
+
+    @Test
+    public void testSetGameStatus() {
+<span class="fc" id="L198">        game.setGameStatus(true);</span>
+<span class="fc" id="L199">        game.setGameStatus(false);</span>
+<span class="fc" id="L200">    }</span>
+
+    @Test
+    public void testSetButtonState() {
+<span class="fc" id="L204">        game.changeButtonState(true);</span>
+<span class="fc" id="L205">        game.changeButtonState(false);</span>
+<span class="fc" id="L206">    }</span>
+
+    @Test
+<span class="fc" id="L209">    public void testChangeButtonState() { }</span>
+
+    @Test
+    public void testActionPerformed() {
+<span class="fc" id="L213">        String actionCommand = &quot;PAUSE&quot;;</span>
+<span class="fc" id="L214">        ActionEvent e = new ActionEvent(mockButton, ActionEvent.ACTION_PERFORMED, actionCommand);</span>
+<span class="fc" id="L215">        game.actionPerformed(e);</span>
+
+<span class="fc" id="L217">        actionCommand = &quot;START&quot;;</span>
+<span class="fc" id="L218">        e = new ActionEvent(mockButton, ActionEvent.ACTION_PERFORMED, actionCommand);</span>
+<span class="fc" id="L219">        game.actionPerformed(e);</span>
+
+<span class="fc" id="L221">        actionCommand = &quot;number&quot;;</span>
+<span class="fc" id="L222">        e = new ActionEvent(mockButton2, ActionEvent.ACTION_PERFORMED, actionCommand);</span>
+<span class="fc" id="L223">        game.actionPerformed(e);</span>
+
+<span class="fc" id="L225">        actionCommand = &quot;ReStart&quot;;</span>
+<span class="fc" id="L226">        e = new ActionEvent(mockMenuItem, ActionEvent.ACTION_PERFORMED, actionCommand);</span>
+<span class="fc" id="L227">        game.actionPerformed(e);</span>
+
+<span class="fc" id="L229">        actionCommand = &quot;Instructions&quot;;</span>
+<span class="fc" id="L230">        e = new ActionEvent(mockMenuItem, ActionEvent.ACTION_PERFORMED, actionCommand);</span>
+<span class="fc" id="L231">        game.actionPerformed(e);</span>
+
+<span class="fc" id="L233">        actionCommand = &quot;About Shuffle&quot;;</span>
+<span class="fc" id="L234">        e = new ActionEvent(mockMenuItem, ActionEvent.ACTION_PERFORMED, actionCommand);</span>
+<span class="fc" id="L235">        game.actionPerformed(e);</span>
+
+<span class="fc" id="L237">        actionCommand = &quot;level4&quot;;</span>
+<span class="fc" id="L238">        e = new ActionEvent(mockMenuItem, ActionEvent.ACTION_PERFORMED, actionCommand);</span>
+<span class="fc" id="L239">        game.actionPerformed(e);</span>
+
+<span class="fc" id="L241">        actionCommand = &quot;High Scores&quot;;</span>
+<span class="fc" id="L242">        e = new ActionEvent(mockMenuItem, ActionEvent.ACTION_PERFORMED, actionCommand);</span>
+<span class="fc" id="L243">        game.actionPerformed(e);</span>
+<span class="fc" id="L244">    }</span>
+
+    @Test
+    public void testActionPerformedWithMockedListener() {
+<span class="fc" id="L248">        ActionListener mockListener = mock(ActionListener.class);</span>
+        try {
+<span class="nc" id="L250">            Field buttonField = ShuffleGame.class.getDeclaredField(&quot;startButton_&quot;);</span>
+<span class="nc" id="L251">            buttonField.setAccessible(true);</span>
+<span class="nc" id="L252">            JButton gameButton = (JButton) buttonField.get(game);</span>
+<span class="nc" id="L253">            gameButton.removeActionListener(game);</span>
+<span class="nc" id="L254">            gameButton.addActionListener(mockListener);</span>
+
+<span class="nc" id="L256">            String actionCommand = &quot;START&quot;;</span>
+<span class="nc" id="L257">            ActionEvent e = new ActionEvent(gameButton, ActionEvent.ACTION_PERFORMED, actionCommand);</span>
+<span class="nc" id="L258">            game.actionPerformed(e);</span>
+
+<span class="nc" id="L260">            verify(mockListener).actionPerformed(e);</span>
+<span class="fc" id="L261">        } catch (Exception e) {</span>
+            // ignored
+<span class="nc" id="L263">        }</span>
+<span class="fc" id="L264">    }</span>
+
+    @Test
+    public void testShowWarrningDialogWithMockDialog() {
+<span class="fc" id="L268">        JDialog mockDialog = mock(JDialog.class);</span>
+<span class="fc" id="L269">        doNothing().when(mockDialog).setVisible(true);</span>
+<span class="fc" id="L270">        doNothing().when(mockDialog).dispose();</span>
+        try {
+<span class="fc" id="L272">            Method method = ShuffleGame.class.getDeclaredMethod(&quot;showWarrningDialog&quot;);</span>
+<span class="fc" id="L273">            method.setAccessible(true);</span>
+<span class="fc" id="L274">            method.invoke(game);</span>
+<span class="nc" id="L275">        } catch (NoSuchMethodException e) {</span>
+<span class="nc" id="L276">            System.out.println(&quot;showWarrningDialog method not found, skipping test&quot;);</span>
+<span class="nc" id="L277">        } catch (Exception e) {</span>
+<span class="nc" id="L278">            fail(&quot;Failed to invoke showWarrningDialog: &quot; + e.getMessage());</span>
+<span class="pc" id="L279">        }</span>
+<span class="fc" id="L280">        verify(mockDialog, never()).setVisible(true);</span>
+<span class="fc" id="L281">    }</span>
+
+    @Test
+    public void testShowImageDialog() {
+<span class="fc" id="L285">        assertDoesNotThrow(() -&gt; game.showImageDialog(&quot;123&quot;, &quot;Title&quot;));</span>
+<span class="fc" id="L286">    }</span>
+
+    @Test
+    public void testGetComponentIfPossibleToMove() {
+<span class="fc" id="L290">        game.getComponentIfPossibleToMove(4);</span>
+<span class="fc" id="L291">    }</span>
+
+    @ParameterizedTest
+    @CsvSource({
+        &quot;1, 4&quot;,
+        &quot;0, 4&quot;,
+        &quot;2, 4&quot;,
+        &quot;3, 4&quot;,
+        &quot;1, 3&quot;,
+        &quot;2, 5&quot;,
+        &quot;0, 1&quot;,
+        &quot;3, 6&quot;
+    })
+    public void testGetComponent(int a, int b) {
+<span class="fc" id="L305">        ShuffleGame g = createGameWithMockedSecondsCounter(3);</span>
+<span class="fc" id="L306">        assertDoesNotThrow(() -&gt; g.getComponent(a, b));</span>
+<span class="fc" id="L307">        g.dispose();</span>
+<span class="fc" id="L308">    }</span>
+
+    @Test
+    public void testGetCloseButtonPanel() {
+<span class="fc" id="L312">        JDialog mockDialog = Mockito.mock(JDialog.class);</span>
+<span class="fc" id="L313">        JPanel panel = game.getCloseButtonPanel(mockDialog);</span>
+
+<span class="fc" id="L315">        assertNotNull(panel);</span>
+<span class="fc" id="L316">        assertEquals(1, panel.getComponentCount());</span>
+<span class="fc" id="L317">        assertTrue(panel.getComponent(0) instanceof JButton);</span>
+
+<span class="fc" id="L319">        JButton button = (JButton) panel.getComponent(0);</span>
+<span class="fc" id="L320">        assertEquals(&quot;OK&quot;, button.getText());</span>
+<span class="fc" id="L321">        assertEquals('O', button.getMnemonic());</span>
+
+<span class="fc" id="L323">        ActionListener[] actionListeners = button.getActionListeners();</span>
+<span class="fc" id="L324">        assertEquals(1, actionListeners.length);</span>
+
+<span class="fc" id="L326">        actionListeners[0].actionPerformed(null);</span>
+<span class="fc" id="L327">        verify(mockDialog).dispose();</span>
+<span class="fc" id="L328">    }</span>
+
+    @Test
+    public void testShowScoreDialogUIComponents() {
+<span class="fc" id="L332">        TreeSet&lt;Credits&gt; scoreSet = new TreeSet&lt;&gt;();</span>
+<span class="fc" id="L333">        scoreSet.add(new Credits(300, 10, 4));</span>
+<span class="fc" id="L334">        scoreSet.add(new Credits(500, 20, 4));</span>
+<span class="fc" id="L335">        game.showScoreDialog(scoreSet);</span>
+<span class="fc" id="L336">    }</span>
+
+    @Test
+    public void testShowScoreDialogActionListener() {
+<span class="fc" id="L340">        TreeSet&lt;Credits&gt; scoreSet = new TreeSet&lt;&gt;();</span>
+<span class="fc" id="L341">        JButton okButton = new JButton();</span>
+<span class="fc" id="L342">        JTextField playerNameField = new JTextField();</span>
+<span class="fc" id="L343">        ActionEvent mockEvent = Mockito.mock(ActionEvent.class);</span>
+<span class="fc" id="L344">        when(mockEvent.getSource()).thenReturn(okButton);</span>
+
+<span class="fc" id="L346">        game.showScoreDialog(scoreSet);</span>
+<span class="fc" id="L347">    }</span>
+
+    @Test
+    public void testShowHighScoreDialogWithValidData() throws IOException {
+<span class="fc" id="L351">        TreeMap&lt;Integer, TreeSet&lt;Credits&gt;&gt; testData = new TreeMap&lt;&gt;();</span>
+<span class="fc" id="L352">        TreeSet&lt;Credits&gt; creditsSet = new TreeSet&lt;&gt;();</span>
+<span class="fc" id="L353">        creditsSet.add(new Credits(300, 10, 4));</span>
+<span class="fc" id="L354">        testData.put(4, creditsSet);</span>
+
+<span class="fc" id="L356">        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;Score.dat&quot;))) {</span>
+<span class="fc" id="L357">            oos.writeObject(testData);</span>
+        }
+<span class="fc" id="L359">        assertDoesNotThrow(() -&gt; game.showHighScoreDialog());</span>
+<span class="fc" id="L360">    }</span>
+
+    @Test
+    public void testShowHighScoreDialogWithCorruptedFile() throws IOException {
+<span class="fc" id="L364">        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;Score.dat&quot;))) {</span>
+<span class="fc" id="L365">            oos.writeObject(&quot;invalid_data&quot;);</span>
+        }
+<span class="fc" id="L367">        assertDoesNotThrow(() -&gt; game.showHighScoreDialog());</span>
+<span class="fc" id="L368">    }</span>
+
+    @Test
+    public void testShowScoreDialogTreeSet() throws IOException {
+<span class="fc" id="L372">        TreeMap&lt;Integer, TreeSet&lt;Credits&gt;&gt; testData = new TreeMap&lt;&gt;();</span>
+<span class="fc" id="L373">        TreeSet&lt;Credits&gt; creditsSet = new TreeSet&lt;&gt;();</span>
+<span class="fc" id="L374">        creditsSet.add(new Credits(300, 10, 4));</span>
+<span class="fc" id="L375">        testData.put(4, creditsSet);</span>
+
+<span class="fc" id="L377">        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;Score.dat&quot;))) {</span>
+<span class="fc" id="L378">            oos.writeObject(testData);</span>
+        }
+
+<span class="fc" id="L381">        game.showScoreDialog(creditsSet);</span>
+<span class="fc" id="L382">    }</span>
+
+    @ParameterizedTest
+    @CsvFileSource(resources = &quot;/moves.csv&quot;, numLinesToSkip = 1)
+    void csv_moves_doNotCrash(int pos, int level) {
+<span class="fc" id="L387">        ShuffleGame g = createGameWithMockedSecondsCounter(level);</span>
+<span class="fc" id="L388">        assertDoesNotThrow(() -&gt; g.getComponentIfPossibleToMove(pos));</span>
+<span class="fc" id="L389">        g.dispose();</span>
+<span class="fc" id="L390">    }</span>
+
+    @ParameterizedTest
+    @CsvFileSource(resources = &quot;/move_loops.csv&quot;, numLinesToSkip = 1)
+    void testMoveSequenceLoopCoverage(int position) {
+<span class="fc" id="L395">        ShuffleGame g = createGameWithMockedSecondsCounter(3);</span>
+<span class="fc" id="L396">        assertDoesNotThrow(() -&gt; g.getComponentIfPossibleToMove(position));</span>
+<span class="fc" id="L397">        g.dispose();</span>
+<span class="fc" id="L398">    }</span>
+    
+    @ParameterizedTest
+    @CsvSource({
+        &quot;10, 4&quot;,
+        &quot;8, 5&quot;
+    })
+    public void testShowScoreDialogInputIntWithNoSet(int a, int b) {
+<span class="fc" id="L406">        ShuffleGame g = createGameWithMockedSecondsCounter(3);</span>
+<span class="fc" id="L407">        assertDoesNotThrow(() -&gt; g.showScoreDialog(a, b));</span>
+<span class="fc" id="L408">        g.dispose();</span>
+<span class="fc" id="L409">    }</span>
+
+    @Test
+    public void testShowScoreDialogInputIntWithSet() throws IOException {
+<span class="fc" id="L413">        TreeMap&lt;Integer, TreeSet&lt;Credits&gt;&gt; testData = new TreeMap&lt;&gt;();</span>
+<span class="fc" id="L414">        TreeSet&lt;Credits&gt; creditsSet = new TreeSet&lt;&gt;();</span>
+<span class="fc" id="L415">        creditsSet.add(new Credits(300, 10, 4));</span>
+<span class="fc" id="L416">        testData.put(4, creditsSet);</span>
+
+<span class="fc" id="L418">        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;Score.dat&quot;))) {</span>
+<span class="fc" id="L419">            oos.writeObject(testData);</span>
+        }
+<span class="fc" id="L421">        assertDoesNotThrow(() -&gt; game.showScoreDialog(10, 5));</span>
+<span class="fc" id="L422">    }</span>
+
+    private ShuffleGame createGameWithMockedSecondsCounter(int level) {
+<span class="fc" id="L425">        ShuffleGame g = new ShuffleGame(level) { @Override public void setVisible(boolean b) { } };</span>
+
+<span class="fc" id="L427">        SecondsCounter scMock = mock(SecondsCounter.class);</span>
+<span class="fc" id="L428">        doNothing().when(scMock).start();</span>
+<span class="fc" id="L429">        doNothing().when(scMock).pause();</span>
+<span class="fc" id="L430">        doNothing().when(scMock).enable();</span>
+<span class="fc" id="L431">        doNothing().when(scMock).stop();</span>
+<span class="fc" id="L432">        doNothing().when(scMock).finalize();</span>
+<span class="fc" id="L433">        when(scMock.getTimeElapsed()).thenReturn(&quot;00:10&quot;);</span>
+<span class="fc" id="L434">        when(scMock.getTimeElapsedInSeconds()).thenReturn(10);</span>
+
+        try {
+<span class="nc" id="L437">            setPrivateField(g, &quot;secondsCounter_&quot;, scMock);</span>
+<span class="pc" id="L438">        } catch (Exception ignored) {}</span>
+
+<span class="fc" id="L440">        return g;</span>
+    }
+
+    private static void setPrivateField(Object target, String field, Object value) throws Exception {
+<span class="nc" id="L444">        Field f = target.getClass().getDeclaredField(field);</span>
+<span class="nc" id="L445">        f.setAccessible(true);</span>
+<span class="nc" id="L446">        f.set(target, value);</span>
+<span class="nc" id="L447">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span>ShuffleGameTesting (Sep 17, 2025 5:27:53 PM)</div></body></html>

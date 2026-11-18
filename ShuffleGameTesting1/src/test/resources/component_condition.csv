@@ -1,0 +1,9 @@
+position,cp,expectedValid
+0,3,true    // TOP, cp=3 (not top edge) -> returns component
+1,1,true    // LEFT, cp=1 (not left edge) -> returns component
+2,0,true    // RIGHT, cp=0 (not right edge) -> returns component
+3,0,true    // BOTTOM, cp=0 (not bottom edge) -> returns component
+0,0,false   // TOP, cp=0 (top edge) -> returns null
+1,0,false   // LEFT, cp=0 (left edge) -> returns null
+2,2,false   // RIGHT, cp=2 (right edge for 3x3) -> returns null
+3,6,false   // BOTTOM, cp=6 (bottom edge for 3x3) -> returns null

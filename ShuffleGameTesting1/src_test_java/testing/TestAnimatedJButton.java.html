@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>TestAnimatedJButton.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">ShuffleGameTesting (Sep 17, 2025 5:27:53 PM)</a> &gt; <a href="../../index.html" class="el_group">ShuffleGameTesting</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">testing</a> &gt; <span class="el_source">TestAnimatedJButton.java</span></div><h1>TestAnimatedJButton.java</h1><pre class="source lang-java linenums">package testing;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import shuff.AnimatedJButton;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+<span class="fc" id="L13">public class TestAnimatedJButton {</span>
+
+    @BeforeAll
+    static void setUp() {
+        // da Swing ne pokušava da otvara prozor tokom testiranja
+<span class="fc" id="L18">        System.setProperty(&quot;java.awt.headless&quot;, &quot;true&quot;);</span>
+<span class="fc" id="L19">    }</span>
+
+    @Test
+    void testConstructor() {
+<span class="fc" id="L23">        AnimatedJButton btn = new AnimatedJButton(&quot;Hello&quot;, 3);</span>
+<span class="fc" id="L24">        assertEquals(&quot;Hello&quot;, btn.getText());</span>
+<span class="fc" id="L25">    }</span>
+
+    @Test
+    void testSetLabelNameAndActionPerformed() {
+<span class="fc" id="L29">        AnimatedJButton btn = new AnimatedJButton(&quot;Hello&quot;, 2);</span>
+<span class="fc" id="L30">        btn.setLabelName(&quot;World&quot;);</span>
+
+<span class="fc" id="L32">        btn.actionPerformed(null); // simuliramo tick timera</span>
+<span class="fc" id="L33">        assertTrue(btn.getText().contains(&quot;W&quot;));</span>
+<span class="fc" id="L34">    }</span>
+
+    @Test
+    void testGetStringDifferentCases() {
+<span class="fc" id="L38">        assertEquals(&quot;H e l l o&quot;, AnimatedJButton.getString(&quot;Hello&quot;, 1));</span>
+<span class="fc" id="L39">        assertEquals(&quot;H  e  l  l  o&quot;, AnimatedJButton.getString(&quot;Hello&quot;, 2));</span>
+<span class="fc" id="L40">        assertEquals(&quot;A&quot;, AnimatedJButton.getString(&quot;A&quot;, 5));  // samo jedno slovo</span>
+<span class="fc" id="L41">        assertEquals(&quot;&quot;, AnimatedJButton.getString(&quot;&quot;, 3));    // prazan string</span>
+<span class="fc" id="L42">    }</span>
+
+    @Test
+    void testActionPerformedCyclesForwardAndBackward() {
+<span class="fc" id="L46">        AnimatedJButton btn = new AnimatedJButton(&quot;Hi&quot;, 1);</span>
+
+        // dovoljno puta da i++ pređe u else granu i vrati se nazad
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        for (int t = 0; t &lt; 5; t++) {</span>
+<span class="fc" id="L50">            btn.actionPerformed(null);</span>
+        }
+
+<span class="fc" id="L53">        assertNotNull(btn.getText());</span>
+<span class="fc" id="L54">        assertTrue(btn.getText().contains(&quot;H&quot;));</span>
+<span class="fc" id="L55">    }</span>
+
+    @Test
+    void testMouseListenerEmptyMethods() {
+<span class="fc" id="L59">        AnimatedJButton btn = new AnimatedJButton(&quot;Test&quot;, 1);</span>
+
+<span class="fc" id="L61">        MouseEvent click = new MouseEvent(btn, MouseEvent.MOUSE_CLICKED,</span>
+<span class="fc" id="L62">                System.currentTimeMillis(), 0, 0, 0, 1, false);</span>
+<span class="fc" id="L63">        MouseEvent press = new MouseEvent(btn, MouseEvent.MOUSE_PRESSED,</span>
+<span class="fc" id="L64">                System.currentTimeMillis(), 0, 0, 0, 1, false);</span>
+<span class="fc" id="L65">        MouseEvent release = new MouseEvent(btn, MouseEvent.MOUSE_RELEASED,</span>
+<span class="fc" id="L66">                System.currentTimeMillis(), 0, 0, 0, 1, false);</span>
+
+<span class="fc" id="L68">        assertDoesNotThrow(() -&gt; btn.mouseClicked(click));</span>
+<span class="fc" id="L69">        assertDoesNotThrow(() -&gt; btn.mousePressed(press));</span>
+<span class="fc" id="L70">        assertDoesNotThrow(() -&gt; btn.mouseReleased(release));</span>
+<span class="fc" id="L71">    }</span>
+
+    
+    @Test
+    void testMouseEnterAndExit() {
+<span class="fc" id="L76">        AnimatedJButton btn = new AnimatedJButton(&quot;Test&quot;, 1);</span>
+
+<span class="fc" id="L78">        MouseEvent enter = new MouseEvent(btn, MouseEvent.MOUSE_ENTERED,</span>
+<span class="fc" id="L79">                System.currentTimeMillis(), 0, 0, 0, 1, false);</span>
+<span class="fc" id="L80">        btn.mouseEntered(enter);</span>
+
+<span class="fc" id="L82">        assertEquals(Cursor.HAND_CURSOR, btn.getCursor().getType());</span>
+
+<span class="fc" id="L84">        MouseEvent exit = new MouseEvent(btn, MouseEvent.MOUSE_EXITED,</span>
+<span class="fc" id="L85">                System.currentTimeMillis(), 0, 0, 0, 1, false);</span>
+<span class="fc" id="L86">        btn.mouseExited(exit);</span>
+
+<span class="fc" id="L88">        assertEquals(Cursor.DEFAULT_CURSOR, btn.getCursor().getType());</span>
+<span class="fc" id="L89">        assertEquals(&quot;Test&quot;, btn.getText()); // resetuje se na originalni tekst</span>
+<span class="fc" id="L90">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span>ShuffleGameTesting (Sep 17, 2025 5:27:53 PM)</div></body></html>

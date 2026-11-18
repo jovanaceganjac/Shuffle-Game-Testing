@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>TestCredits.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">ShuffleGameTesting (Sep 17, 2025 9:12:18 PM)</a> &gt; <a href="../../index.html" class="el_group">ShuffleGameTesting</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">testing</a> &gt; <span class="el_source">TestCredits.java</span></div><h1>TestCredits.java</h1><pre class="source lang-java linenums">package testing;
+import shuff.Credits;
+import static org.junit.jupiter.api.Assertions.*;  
+import org.junit.jupiter.api.Test;
+
+
+<span class="fc" id="L7">public class TestCredits {</span>
+	
+	 @Test
+	    void testConstructorAndPrepareTimeString() {
+<span class="fc" id="L11">	        Credits c = new Credits(125, 50, 2); // 2 min 5 sec</span>
+<span class="fc" id="L12">	        assertEquals(125, c.getTimeInSeconds());</span>
+<span class="fc" id="L13">	        assertEquals(2, c.getLevel());</span>
+<span class="fc" id="L14">	        assertEquals(50, c.getMoves());</span>
+<span class="fc" id="L15">	        assertEquals(&quot;2:5&quot;, c.getTime());</span>
+<span class="fc" id="L16">	    }</span>
+
+	    @Test
+	    void testGetPlayerInitiallyEmpty() {
+<span class="fc" id="L20">	        Credits c = new Credits(100, 10, 1);</span>
+<span class="fc" id="L21">	        assertEquals(&quot;&quot;, c.getPlayer(), &quot;Player should be empty string initially&quot;);</span>
+<span class="fc" id="L22">	    }</span>
+
+	    @Test
+	    void testSetAndGetPlayer() {
+<span class="fc" id="L26">	        Credits c = new Credits(100, 10, 1);</span>
+<span class="fc" id="L27">	        c.setPlayer(&quot;Alice&quot;);</span>
+<span class="fc" id="L28">	        assertEquals(&quot;Alice&quot;, c.getPlayer());</span>
+<span class="fc" id="L29">	    }</span>
+
+	    @Test
+	    void testGetTimeWithZeroSeconds() {
+<span class="fc" id="L33">	        Credits c = new Credits(0, 10, 1);</span>
+<span class="fc" id="L34">	        assertEquals(&quot;&quot;, c.getTime(), &quot;Time string should be empty if seconds is 0&quot;);</span>
+<span class="fc" id="L35">	    }</span>
+
+	    @Test
+	    void testCompareDifferentSeconds() {
+<span class="fc" id="L39">	        Credits c1 = new Credits(100, 10, 1);</span>
+<span class="fc" id="L40">	        Credits c2 = new Credits(200, 5, 1);</span>
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">	        assertTrue(c1.compareTo(c2) &lt; 0);</span>
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">	        assertTrue(c2.compareTo(c1) &gt; 0);</span>
+<span class="fc" id="L43">	    }</span>
+
+	    @Test
+	    void testCompareSameSecondsDifferentMoves() {
+<span class="fc" id="L47">	        Credits c1 = new Credits(100, 5, 1);</span>
+<span class="fc" id="L48">	        Credits c2 = new Credits(100, 10, 1);</span>
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">	        assertTrue(c1.compareTo(c2) &lt; 0);</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">	        assertTrue(c2.compareTo(c1) &gt; 0);</span>
+<span class="fc" id="L51">	    }</span>
+
+	    @Test
+	    void testCompareSameSecondsAndMovesDifferentPlayer() {
+<span class="fc" id="L55">	        Credits c1 = new Credits(100, 10, 1);</span>
+<span class="fc" id="L56">	        c1.setPlayer(&quot;Alice&quot;);</span>
+<span class="fc" id="L57">	        Credits c2 = new Credits(100, 10, 1);</span>
+<span class="fc" id="L58">	        c2.setPlayer(&quot;Bob&quot;);</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">	        assertTrue(c1.compareTo(c2) &lt; 0);</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">	        assertTrue(c2.compareTo(c1) &gt; 0);</span>
+<span class="fc" id="L61">	    }</span>
+
+	    @Test
+	    void testCompareEquals() {
+<span class="fc" id="L65">	        Credits c1 = new Credits(100, 10, 1);</span>
+<span class="fc" id="L66">	        c1.setPlayer(&quot;Alice&quot;);</span>
+<span class="fc" id="L67">	        Credits c2 = new Credits(100, 10, 1);</span>
+<span class="fc" id="L68">	        c2.setPlayer(&quot;Alice&quot;);</span>
+<span class="fc" id="L69">	        assertEquals(0, c1.compareTo(c2));</span>
+<span class="fc" id="L70">	    }</span>
+
+	    @Test
+	    void testCompareDoubleMethod() {
+<span class="fc" id="L74">	        Credits c = new Credits(0, 0, 1);</span>
+<span class="fc" id="L75">	        assertEquals(1, c.compare(5.0, 3.0));</span>
+<span class="fc" id="L76">	        assertEquals(-1, c.compare(2.0, 3.0));</span>
+<span class="fc" id="L77">	        assertEquals(0, c.compare(3.0, 3.0));</span>
+<span class="fc" id="L78">	    }</span>
+
+	    @Test
+	    void testCompareIntMethod() {
+<span class="fc" id="L82">	        Credits c = new Credits(0, 0, 1);</span>
+<span class="fc" id="L83">	        assertEquals(1, c.compare(5, 3));</span>
+<span class="fc" id="L84">	        assertEquals(-1, c.compare(2, 3));</span>
+<span class="fc" id="L85">	        assertEquals(0, c.compare(3, 3));</span>
+<span class="fc" id="L86">	    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span>ShuffleGameTesting (Sep 17, 2025 9:12:18 PM)</div></body></html>

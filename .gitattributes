@@ -1,0 +1,6 @@
+# JaCoCo coverage reports are generated, keep them out of GitHub language stats
+*.html linguist-generated linguist-vendored
+*.js   linguist-generated linguist-vendored
+*.css  linguist-generated linguist-vendored
+coverage/** linguist-generated linguist-vendored
+ShuffleGameTesting1/target/** linguist-generated linguist-vendored

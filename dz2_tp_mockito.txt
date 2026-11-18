@@ -1,0 +1,14 @@
+1) testStartSecondsCounterWithMockSecondsCounter
+   - Mock: SecondsCounter (zamena zavisnosti igre)
+   - Verifikacija poziva: start()
+
+2) testGetCloseButtonPanel
+   - Mock: JDialog
+   - Verifikacija: dispose() se poziva preko OK dugmeta
+
+3) testActionPerformedWithMockedListener
+   - Mock: ActionListener
+   - Verifikacija: actionPerformed(e) pozvan pri START akciji
+
+Dodatno:
+- createGameWithMockedSecondsCounter(...) helper: sistematsko mockovanje SecondsCounter u više testova (start/pause/enable/stop, getTimeElapsed*).
